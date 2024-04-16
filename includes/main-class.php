@@ -1,18 +1,8 @@
 <?php
-class ElementorContentIntegrator {
-
-    public function __construct() {
-        // Attachez vos fonctions aux hooks appropriés d'Elementor
-        add_action('elementor/widgets/widgets_registered', [$this, 'on_widgets_registered']);
-    }
-
-    public function on_widgets_registered() {
-        require_once('path/to/your/custom-widget.php'); // Assurez-vous de mettre le chemin correct vers votre fichier de widget personnalisé
-        \Elementor\Plugin::instance()->widgets_manager->register_widget_type(new \Elementor_Custom_Widget());
-    }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 
-// Classe de widget personnalisée pour Elementor
 class Elementor_Custom_Widget extends \Elementor\Widget_Base {
 
     public function get_name() {
@@ -28,7 +18,6 @@ class Elementor_Custom_Widget extends \Elementor\Widget_Base {
     }
 
     protected function _register_controls() {
-        
         $this->start_controls_section(
             'content_section',
             [
@@ -86,5 +75,3 @@ class Elementor_Custom_Widget extends \Elementor\Widget_Base {
         }
     }
 }
-
-new ElementorContentIntegrator();
