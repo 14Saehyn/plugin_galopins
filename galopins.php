@@ -11,14 +11,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function eci_load_plugin() {
+    include_once('includes/main-class.php');
+}
+
+add_action('plugins_loaded', 'eci_load_plugin', 100); // Priorité élevée pour s'assurer que cela se charge après Elementor
+
+function eci_register_widgets() {
+    // Vérifiez si Elementor est chargé et actif.
     if ( ! did_action( 'elementor/loaded' ) ) {
         add_action('admin_notices', 'eci_admin_notice_missing_main_plugin');
         return;
     }
-    
-    include_once('includes/main-class.php');
+
+    // Charge et enregistre le widget
+    \Elementor\Plugin::instance()->widgets_manager->register_widget_type(new \Elementor_Custom_Widget());
 }
-add_action( 'plugins_loaded', 'eci_load_plugin' );
+
+add_action('elementor/init', 'eci_register_widgets'); // Utilisez `elementor/init` pour enregistrer des widgets
 
 function eci_admin_notice_missing_main_plugin() {
     if ( isset( $_GET['activate'] ) ) unset( $_GET['activate'] );
