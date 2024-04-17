@@ -3,54 +3,22 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-add_action('admin_menu', 'galopins_add_admin_menu');
-
-// Ajoutez un élément de menu à la barre latérale de l'administration
-function galopins_add_admin_menu() {
-    add_menu_page(
-        'Galopins Content Settings',          // Titre de la page
-        'Galopins',                            // Titre du menu
-        'galopins_content_settings',           // Slug du menu
-        'galopins_content_settings_page',      // Fonction pour afficher la page de contenu
-        'dashicons-admin-post',                // Icône du menu
-        6                                      // Position dans le menu
-    );
-}
-
-// Afficher la page des paramètres pour ajouter du contenu
-function galopins_content_settings_page() {
-    ?>
-    <div class="wrap">
-        <h1>Ajouter du Contenu</h1>
-        <form method="post" action="options.php">
-            <?php
-            settings_fields('galopins_content_settings');
-            do_settings_sections('galopins_content_settings');
-            submit_button('Sauvegarder le Contenu');
-            ?>
-        </form>
-    </div>
-    <?php
-}
-
-add_action('admin_init', 'galopins_content_settings_init');
-
 // Initialisation des réglages
 function galopins_content_settings_init() {
-    register_setting('galopins_content_settings', 'galopins_content');
+    register_setting('galopins_plugin_settings', 'galopins_content');
 
     add_settings_section(
         'galopins_content_section',
         __('Configurez votre contenu', 'galopins'),
         'galopins_content_section_callback',
-        'galopins_content_settings'
+        'galopins_plugin_settings'
     );
 
     add_settings_field(
         'galopins_title',
         __('Titre', 'galopins'),
         'galopins_title_render',
-        'galopins_content_settings',
+        'galopins_plugin_settings',
         'galopins_content_section'
     );
 
@@ -58,7 +26,7 @@ function galopins_content_settings_init() {
         'galopins_text',
         __('Texte', 'galopins'),
         'galopins_text_render',
-        'galopins_content_settings',
+        'galopins_plugin_settings',
         'galopins_content_section'
     );
 
@@ -66,13 +34,15 @@ function galopins_content_settings_init() {
         'galopins_image',
         __('Image', 'galopins'),
         'galopins_image_render',
-        'galopins_content_settings',
+        'galopins_plugin_settings',
         'galopins_content_section'
     );
 }
 
+add_action('admin_init', 'galopins_content_settings_init');
+
 function galopins_content_section_callback() {
-    echo 'Entrez les détails de votre contenu ici.';
+    echo __('Entrez les détails de votre contenu ici.', 'galopins');
 }
 
 function galopins_title_render() {
@@ -99,26 +69,7 @@ function galopins_image_render() {
 
 add_action('admin_footer', 'galopins_admin_scripts');  // Ajouter le script au footer de l'admin
 
-// JavaScript pour le téléchargeur d'image
-function galopins_admin_scripts() {
-    ?>
-    <script>
-    function upload_image(button) {
-        var frame = wp.media({
-            title: 'Sélectionner ou uploader votre image',
-            button: {
-                text: 'Utiliser cette image'
-            },
-            multiple: false
-        });
-
-        frame.on('select', function() {
-            var attachment = frame.state().get('selection').first().toJSON();
-            jQuery(button).prev().val(attachment.url);
-        });
-
-        frame.open();
-    }
-    </script>
-    <?php
-}
+// // JavaScript pour le téléchargeur d'image
+// function galopins_admin_scripts() {
+//     // Votre code JS pour le téléchargeur d'image
+// }
