@@ -10,7 +10,7 @@ class Elementor_Custom_Widget extends \Elementor\Widget_Base {
     }
 
     public function get_title() {
-        return __('Custom Elementor Widget', 'elementor-content-integrator');
+        return __('Galopins Widget', 'elementor-content-integrator');
     }
 
     public function get_icon() {
