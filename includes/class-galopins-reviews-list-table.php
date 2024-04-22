@@ -88,21 +88,4 @@ class Galopins_Reviews_List_Table extends WP_List_Table {
             }
         }
     }
-
-    public function column_client_name($item) {
-        // Création d'un lien de suppression
-        $delete_nonce = wp_create_nonce('galopins_delete_review');
-        $title = '<strong>' . $item['client_name'] . '</strong>';
-        $actions = [
-            'delete' => sprintf(
-                '<a href="?page=%s&action=%s&review=%s&_wpnonce=%s">Supprimer</a>',
-                esc_attr($_REQUEST['page']),
-                'delete',
-                absint($item['id']),
-                $delete_nonce
-            ),
-        ];
-
-        return $title . $this->row_actions($actions);
-    }
 }
