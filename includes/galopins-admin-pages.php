@@ -4,6 +4,8 @@ function galopins_menu() {
     add_menu_page('Galopins Plugin Settings', 'Galopins', 'administrator', 'galopins-settings', 'galopins_settings_page', 'dashicons-testimonial');
     add_submenu_page('galopins-settings', 'Ajouter un avis', 'Ajouter un avis', 'administrator', 'galopins-add', 'galopins_add_page');
     add_submenu_page('galopins-settings', 'Voir les avis', 'Voir les avis', 'administrator', 'galopins-view', 'galopins_view_page');
+    add_submenu_page('galopins-settings', 'Ajouter un événement', 'Ajouter un événement', 'administrator', 'galopins-add-event', 'galopins_add_event_page');
+    add_submenu_page('galopins-settings', 'Voir les événements', 'Voir les événements', 'administrator', 'galopins-view-events', 'galopins_view_events_page');
 }
 
 // Tableau de bord
@@ -109,6 +111,94 @@ function galopins_view_page() {
     ?>
     <div class="wrap">
         <h2>Liste des avis</h2>
+        <form method="post">
+            <?php $list_table->display(); ?>
+        </form>
+    </div>
+    <?php
+}
+
+function galopins_add_event_page() {
+    global $wpdb;
+
+    // Vérification de la méthode POST et du nonce
+    if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['action']) && $_POST['action'] == 'add_event') {
+        if (check_admin_referer('add_event_nonce')) {
+            // $wpdb->show_errors();  // Activer l'affichage des erreurs SQL
+            
+            $result = $wpdb->insert($wpdb->prefix . 'galopins_events', array(
+                'event_name' => sanitize_text_field($_POST['event_name']),
+                'event_description' => sanitize_text_field($_POST['event_description']),
+                'event_date' => intval($_POST['event_date'])
+            ));
+
+            $wpdb->print_error();  // Afficher les erreurs SQL
+
+            if ($result) {
+                echo '<div class="updated"><p>Événement ajouté avec succès.</p></div>';
+            } else {
+                echo '<div class="error"><p>Erreur lors de l\'ajout de l\'événement.</p></div>';
+            }
+        }
+    }
+
+    // Formulaire d'ajout
+    ?>
+    <div class="wrap">
+        <h2>Ajouter un témoignage</h2>
+        <form method="post" action="">
+            <?php wp_nonce_field('add_event_nonce'); ?>
+            <input type="hidden" name="action" value="add_event">
+            <table class="form-table">
+                <tr valign="top">
+                <th scope="row">Nom de l'événement</th>
+                <td><input type="text" name="event_name" required /></td>
+                </tr>
+                
+                <tr valign="top">
+                <th scope="row">Description de l'événement</th>
+                <td><input type="text" name="event_description" required /></td>
+                </tr>
+
+                <tr valign="top">
+                <th scope="row">Date</th>
+                <td><input type="date" name="event_date" required /></td>
+                </tr>
+            </table>
+            
+            <?php submit_button('Ajouter un événement'); ?>
+        </form>
+    </div>
+    <?php
+}
+
+function galopins_view_event_page() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'galopins_events';
+
+    $list_table = new Galopins_Events_List_Table();
+    // Handle bulk actions
+    $list_table->process_bulk_action();
+
+    // Vérifie si l'action de suppression a été demandée
+    if (isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['review'])) {
+        // Vérifier le nonce
+        $nonce = esc_attr($_REQUEST['_wpnonce']);
+        if (!wp_verify_nonce($nonce, 'galopins_events_delete_event')) {
+            die('Go get a life script kiddies');
+        }
+        else {
+            // Suppression de l'avis
+            $review_id = absint($_GET['event']);
+            $wpdb->delete($table_name, array('id' => $event_id), array('%d'));
+        }
+    }
+
+    $list_table = new Galopins_Events_List_Table();
+    $list_table->prepare_items();
+    ?>
+    <div class="wrap">
+        <h2>Liste des événements</h2>
         <form method="post">
             <?php $list_table->display(); ?>
         </form>

@@ -3,6 +3,7 @@
 class Galopins_Installer {
     public static function install() {
         register_activation_hook(__FILE__, 'galopins_install');
+        register_activation_hook(__FILE__, 'galopins_events');
         
         function galopins_install() {
             global $wpdb;
@@ -20,6 +21,22 @@ class Galopins_Installer {
                 PRIMARY KEY  (id)
             ) $charset_collate;";
         
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+        }
+
+        function galopins_events() {
+            global $wpdb;
+            $table_name = $wpdb->prefix . "galopins_events";
+            $charset_collate = $wpdb->get_charset_collate();
+            $sql = "CREATE TABLE $table_name (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                event_name tinytext NOT NULL,
+                event_description text NOT NULL,
+                event_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+                PRIMARY KEY  (id)
+            ) $charset_collate;";
+
             require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
             dbDelta($sql);
         }
